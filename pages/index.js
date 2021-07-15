@@ -1,7 +1,52 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from 'next/head';
+import styles from '../styles/Home.module.css';
+import Button from '@material-ui/core/Button';
+import { useState } from 'react';
+
+import axios from 'axios';
 
 export default function Home() {
+  const [value, setValue] = useState(0);
+  const Calculadora = (value1, value2) => {
+    return value1 + value2;
+  };
+  const handleOnClick = async () => {
+    let config = {
+      method: 'get',
+      url: 'https://cors-anywhere.herokuapp.com/http://crefaz.com.br/enel/checa_data.php?dt=2021-03-31&uf=CE',
+      headers: {},
+      maxRedirects: 0,
+    };
+
+    axios(config)
+      .then((response) => {
+        //  console.log(response.data);
+
+        var el = document.createElement('html');
+        el.innerHTML = response.data;
+
+        const aa = el.getElementsByTagName('pre');
+        const text = aa[0].textContent;
+        console.log(text);
+
+        console.log(
+          text,
+          Number(
+            text.substr(text.search('codProduto') + 'codProduto'.length + 4, 5)
+          )
+        );
+
+        setValue(
+          Number(
+            text.substr(text.search('codProduto') + 'codProduto'.length + 4, 5)
+          )
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -10,43 +55,18 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
         <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+          <div className={styles.card}>
+            <div className={styles.values}>
+              <div className={styles.value}>Valor:</div>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+              <div className={styles.value}>{value}</div>
+            </div>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+            <Button variant="contained" color="primary" onClick={handleOnClick}>
+              Hello World
+            </Button>
+          </div>
         </div>
       </main>
 
@@ -61,5 +81,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  )
+  );
 }
